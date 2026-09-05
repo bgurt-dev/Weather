@@ -1,11 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
+    <title>Прогноз погоди</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div class="weather-widget">
+        
+        <header class="widget-header">
+            <h2 class="title-weekly">Прогноз погоди на тиждень</h2>
+            <h2 class="title-today">Прогноз погоди на сьогодні</h2>
+        </header>
+        
+       
+        <div class="widget-content">
+           
+            <div class="week-grid" id="week-grid">
+              
+            </div>
+            
+           
+            <div class="today-details" id="today-details">
+                <div class="loading">Завантаження погоди...</div>
+            </div>
+        </div>
+    </div>
+
     
+    <script src="script.js"></script>
 </body>
 </html>
+
+
