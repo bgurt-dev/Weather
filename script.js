@@ -1,4 +1,5 @@
 
+
 const LATITUDE = 50.4501;
 const LONGITUDE = 30.5234;
 
@@ -7,53 +8,79 @@ const dayNames = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
 
 function getWeatherMeta(code) {
-    if ([0].includes(code)) return { icon: '☀️', desc: 'Ясно' };
-    if ([1, 2, 3].includes(code)) return { icon: '⛅', desc: 'Мінлива хмарність' };
-    if ([45, 48].includes(code)) return { icon: '🌫️', desc: 'Туман' };
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return { icon: '🌧️', desc: 'Дощ' };
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return { icon: '❄️', desc: 'Сніг' };
-    if ([95, 96, 99].includes(code)) return { icon: '⚡', desc: 'Гроза' };
+    if (code === 0) return { icon: '☀️', desc: 'Ясно' };
+    if (code > 0 && code <= 3) return { icon: '⛅', desc: 'Мінлива хмарність' };
+    if (code >= 45 && code <= 48) return { icon: '🌫️', desc: 'Туман' };
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return { icon: '🌧️', desc: 'Дощ' };
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return { icon: '❄️', desc: 'Сніг' };
+    if (code >= 95) return { icon: '⚡', desc: 'Гроза' };
     return { icon: '☁️', desc: 'Хмарно' };
 }
 
 async function fetchWeather() {
     try {
-        // Запрос к бесплатному API Open-Meteo (Текущая погода + прогноз на 7 дней)
-        const url = `https://open-meteo.com{LATITUDE}&longitude=${LONGITUDE}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
-        const response = await fetch(url);
-        const data = await response.json();
+        const url = 'https://open-meteo.com';
         
+        const response = await fetch(url);
+        
+        
+        const contentType = response.headers.get("content-type");
+        if (!response.ok || !contentType || !contentType.includes("application/json")) {
+            throw new Error('Сервер повернув не JSON');
+        }
+        
+        const data = await response.json();
         renderWeather(data);
     } catch (error) {
-        document.getElementById('today-details').innerHTML = '<div class="loading">Помилка завантаження даних...</div>';
-        console.error("Ошибка получения погоды:", error);
+        console.warn("Сервер погоды временно недоступен. Загружаем демо-данные...", error);
+        
+        loadDemoData();
     }
+}
+
+
+function loadDemoData() {
+    const demoData = {
+        current_weather: {
+            temperature: 18,
+            weathercode: 3,
+            windspeed: 12
+        },
+        daily: {
+            time: [], // Сейчас заполним массив на 7 дней вперед автоматически
+            temperature_2m_max:,
+            temperature_2m_min:,
+            weathercode: [3, 0, 1, 51, 3, 0, 0]
+        }
+    };
+
+    
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        demoData.daily.time.push(d.toISOString().split('T')[0]);
+    }
+
+    renderWeather(demoData);
 }
 
 function renderWeather(data) {
     const weekGrid = document.getElementById('week-grid');
-    const todayDetails = document.getElementById('today-details');
-    
+    if (!weekGrid) return;
     
     weekGrid.innerHTML = '';
-    
-    
     const dailyData = data.daily;
-    
     
     dailyData.time.forEach((dateStr, index) => {
         const date = new Date(dateStr);
         const dayName = dayNames[date.getDay()];
         const maxTemp = Math.round(dailyData.temperature_2m_max[index]);
+        const minTemp = Math.round(dailyData.temperature_2m_min[index]);
         const weatherMeta = getWeatherMeta(dailyData.weathercode[index]);
         
         const dayCard = document.createElement('div');
-        dayCard.className = `day-card ${index === 0 ? 'active' : ''}`;
-        dayCard.innerHTML = `
-            <span>${dayName}.</span>
-            <span class="day-temp">${weatherMeta.icon} ${maxTemp}°C</span>
-        `;
-        
+        dayCard.className = 'day-card' + (index === 0 ? ' active' : '');
+        dayCard.innerHTML = '<span>' + dayName + '.</span><span class="day-temp">' + weatherMeta.icon + ' ' + maxTemp + '°C</span>';
         
         dayCard.addEventListener('click', () => {
             document.querySelectorAll('.day-card').forEach(card => card.classList.remove('active'));
@@ -62,16 +89,15 @@ function renderWeather(data) {
             showDetailedWeather(
                 dayName, 
                 maxTemp, 
-                Math.round(dailyData.temperature_2m_min[index]), 
+                minTemp, 
                 weatherMeta,
-                data.current_weather.windspeed // Просто для примера берем общую скорость ветра
+                data.current_weather.windspeed
             );
         });
         
         weekGrid.appendChild(dayCard);
     });
 
-    
     const initialMeta = getWeatherMeta(data.current_weather.weathercode);
     showDetailedWeather(
         dayNames[new Date().getDay()], 
@@ -84,6 +110,8 @@ function renderWeather(data) {
 
 function showDetailedWeather(day, maxTemp, minTemp, meta, wind) {
     const todayDetails = document.getElementById('today-details');
+    if (!todayDetails) return;
+    
     todayDetails.innerHTML = `
         <div class="today-main">
             <div class="today-icon">${meta.icon}</div>
