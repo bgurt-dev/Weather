@@ -19,7 +19,7 @@ function getWeatherMeta(code) {
 
 async function fetchWeather() {
     try {
-        const url = 'https://open-meteo.com';
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=50.4501&longitude=30.5234&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto';
         
         const response = await fetch(url);
         
@@ -47,9 +47,9 @@ function loadDemoData() {
             windspeed: 12
         },
         daily: {
-            time: [], // Сейчас заполним массив на 7 дней вперед автоматически
-            temperature_2m_max:,
-            temperature_2m_min:,
+            time: [],
+            temperature_2m_max:{},
+            temperature_2m_min:{},
             weathercode: [3, 0, 1, 51, 3, 0, 0]
         }
     };
