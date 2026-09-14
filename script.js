@@ -31,6 +31,7 @@ async function fetchWeather() {
         
         const data = await response.json();
         renderWeather(data);
+        console.log()
     } catch (error) {
         console.warn("Сервер погоды временно недоступен. Загружаем демо-данные...", error);
         
@@ -42,9 +43,9 @@ async function fetchWeather() {
 function loadDemoData() {
     const demoData = {
         current_weather: {
-            temperature: 18,
-            weathercode: 3,
-            windspeed: 12
+            temperature: 25,
+            weathercode: 12,
+            windspeed: 4
         },
         daily: {
             time: [],
@@ -74,9 +75,9 @@ function renderWeather(data) {
     dailyData.time.forEach((dateStr, index) => {
         const date = new Date(dateStr);
         const dayName = dayNames[date.getDay()];
-        const maxTemp = Math.round(dailyData.temperature_2m_max[index]);
-        const minTemp = Math.round(dailyData.temperature_2m_min[index]);
-        const weatherMeta = getWeatherMeta(dailyData.weathercode[index]);
+        const maxTemp = Math.round(dailyData.temperature_2m_max[0]);
+        const minTemp = Math.round(dailyData.temperature_2m_min[0]);
+        const weatherMeta = getWeatherMeta(dailyData.weathercode[0]);
         
         const dayCard = document.createElement('div');
         dayCard.className = 'day-card' + (index === 0 ? ' active' : '');
@@ -91,20 +92,21 @@ function renderWeather(data) {
                 maxTemp, 
                 minTemp, 
                 weatherMeta,
-                data.current_weather.windspeed
+                data.daily.windspeed
             );
         });
         
         weekGrid.appendChild(dayCard);
     });
 
-    const initialMeta = getWeatherMeta(data.current_weather.weathercode);
+    const initialMeta = getWeatherMeta();
     showDetailedWeather(
         dayNames[new Date().getDay()], 
-        Math.round(data.current_weather.temperature), 
-        Math.round(dailyData.temperature_2m_min[0]), 
+        Math.round(data.daily.temperature), 
+        Math.round(data.daily.temperature_2m_min[0]), 
         initialMeta,
-        data.current_weather.windspeed
+        data.daily.maxTemp
+   
     );
 }
 
@@ -121,7 +123,7 @@ function showDetailedWeather(day, maxTemp, minTemp, meta, wind) {
         <div class="today-info">
             • День тижня: <strong>${day}</strong><br>
             • Мінімальна температура: <strong>${minTemp}°C</strong><br>
-            • Швидкість вітру: <strong>${wind} км/год</strong>
+            • Максимальна температура: <strong>${maxTemp}°C</strong><br>
         </div>
     `;
 }
