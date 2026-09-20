@@ -75,9 +75,9 @@ function renderWeather(data) {
     dailyData.time.forEach((dateStr, index) => {
         const date = new Date(dateStr);
         const dayName = dayNames[date.getDay()];
-        const maxTemp = Math.round(dailyData.temperature_2m_max[0]);
-        const minTemp = Math.round(dailyData.temperature_2m_min[0]);
-        const weatherMeta = getWeatherMeta(dailyData.weathercode[0]);
+        const maxTemp = Math.round(dailyData.temperature_2m_max[index]);
+        const minTemp = Math.round(dailyData.temperature_2m_min[index]);
+        const weatherMeta = getWeatherMeta(dailyData.weathercode[index]);
         
         const dayCard = document.createElement('div');
         dayCard.className = 'day-card' + (index === 0 ? ' active' : '');
@@ -92,22 +92,45 @@ function renderWeather(data) {
                 maxTemp, 
                 minTemp, 
                 weatherMeta,
-                data.daily.windspeed
+                data.current_weather ? data.current_weather.windspeed : undefined
             );
         });
         
         weekGrid.appendChild(dayCard);
     });
 
-    const initialMeta = getWeatherMeta();
+    const initialMeta = getWeatherMeta(dailyData.weathercode[0]);
     showDetailedWeather(
         dayNames[new Date().getDay()], 
-        Math.round(data.daily.temperature), 
-        Math.round(data.daily.temperature_2m_min[0]), 
+        Math.round(dailyData.temperature_2m_max[0]), 
+        Math.round(dailyData.temperature_2m_min[0]), 
         initialMeta,
-        data.daily.maxTemp
-   
+        data.current_weather ? data.current_weather.windspeed : undefined
     );
+}
+
+function loadDemoData() {
+    const demoData = {
+        current_weather: {
+            temperature: 25,
+            weathercode: 12,
+            windspeed: 4
+        },
+        daily: {
+            time: [],
+            temperature_2m_max: [22, 24, 20, 18, 21, 25, 23],
+            temperature_2m_min: [12, 14, 10, 9, 11, 15, 13],
+            weathercode: [3, 0, 1, 51, 3, 0, 0]
+        }
+    };
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        demoData.daily.time.push(d.toISOString().split('T')[0]);
+    }
+
+    renderWeather(demoData);
 }
 
 function showDetailedWeather(day, maxTemp, minTemp, meta, wind) {
