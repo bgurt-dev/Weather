@@ -1,7 +1,7 @@
 
 
-const LATITUDE = 50.4501;
-const LONGITUDE = 30.5234;
+const LATITUDE = 51.3283;
+const LONGITUDE = 26.6346;
 
 
 const dayNames = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
