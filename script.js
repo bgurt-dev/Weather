@@ -1,7 +1,7 @@
 
 
-const LATITUDE = 51.3283;
-const LONGITUDE = 26.6346;
+const LATITUDE = 48.4675;
+const LONGITUDE = 35.0407;
 
 
 const dayNames = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -19,7 +19,7 @@ function getWeatherMeta(code) {
 
 async function fetchWeather() {
     try {
-        const url = 'https://api.open-meteo.com/v1/forecast?latitude=50.4501&longitude=30.5234&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto';
+        const url = 'https://open-meteo.com';
         
         const response = await fetch(url);
         
