@@ -32,10 +32,11 @@ body {
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.widget-header h2 {
+.widget-header h2 , h1, .title-today-mob {
     color: #ffffff;
     font-size: 1.4rem;
     font-weight: 500;
+text-align: center;
 }
 
 .widget-content {
@@ -120,6 +121,17 @@ body {
     opacity: 0.7;
 }
 
+.title-today {
+        display: block;
+
+    }
+    .title-today-mob {
+        display: none;
+      margin-top: 12px;
+      margin-bottom: 16px;
+     
+    }
+
 
 @media (max-width: 768px) {
     .widget-header {
@@ -148,5 +160,16 @@ body {
         border-right: 1px solid rgba(255, 255, 255, 0.1);
         min-width: 90px;
     }
+    .title-today {
+        display: none;
+
+    }
+    .title-today-mob {
+        display: block;
+     
+     
+    }
 }
+
+
 
